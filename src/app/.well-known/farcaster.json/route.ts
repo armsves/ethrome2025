@@ -20,6 +20,7 @@ export async function GET() {
       version: "1",
       name: "iExec DataProtector Mini App",
       homeUrl: URL,
+      iconUrl: `${URL}/vercel.svg`,
       splashBackgroundColor: "#F4F7FC",
       subtitle: "Secure data protection",
       description: "Protect your data with iExec DataProtector. Encrypt, store, and grant access to your data securely on the blockchain.",
