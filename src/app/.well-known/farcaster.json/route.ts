@@ -8,11 +8,10 @@ export async function GET() {
   const URL = process.env.NEXT_PUBLIC_URL as string;
 
   const manifest = {
-    accountAssociation: {
-      // These will be generated in step 5 using Base Build Account association tool
-      header: "",
-      payload: "",
-      signature: ""
+    "accountAssociation": {
+      "header": "eyJmaWQiOjIxNjM4MywidHlwZSI6ImF1dGgiLCJrZXkiOiIweENhMDU3RDcxRWY1NDE5RDZDNzhlNTI3MTU2NUFDZEMwMzAxZjA0ODAifQ",
+      "payload": "eyJkb21haW4iOiJldGhyb21lMjAyNS52ZXJjZWwuYXBwIn0",
+      "signature": "JIe7MjJBL6f8Dv3pnadSfWQCO1Q286qZQXlOJA1ixOZKh/43nn8gBXFWPBwKthLfLnf4X8pxLfqzvMN49xHKphw="
     },
     baseBuilder: {
       ownerAddress: "0x1eA091521DC4A2035a586995f9fB7ca7b0F646ad"
