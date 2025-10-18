@@ -6,6 +6,10 @@ A minimal starter to quickly get started with iExec DataProtector and Next.js.
 
 https://github.com/aeither/fhevm-hardhat-template
 
+## Base Agent
+
+https://github.com/aeither/base-xmtp-agent
+
 ---
 
 ## 📋 About
