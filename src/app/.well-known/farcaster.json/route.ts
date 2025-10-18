@@ -15,7 +15,7 @@ export async function GET() {
       signature: ""
     },
     baseBuilder: {
-      allowedAddresses: [""] // Add your Base Account address here
+      ownerAddress: "0x1eA091521DC4A2035a586995f9fB7ca7b0F646ad"
     },
     miniapp: {
       version: "1",
