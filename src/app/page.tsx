@@ -185,19 +185,19 @@ export default function Home() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-5">
-      <nav className="bg-[#F4F7FC] rounded-xl p-4 mb-8 flex justify-between items-center">
-        <div className="flex items-center gap-6">
-          <div className="font-mono text-xl font-bold text-gray-800">
+    <div className="max-w-6xl mx-auto p-3 sm:p-5">
+      <nav className="bg-[#F4F7FC] rounded-xl p-3 sm:p-4 mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex items-center gap-4 sm:gap-6 w-full sm:w-auto">
+          <div className="font-mono text-lg sm:text-xl font-bold text-gray-800 truncate">
             iExec NextJs Starter
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
           {isConnected && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               <label
                 htmlFor="chain-selector"
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-medium text-gray-700 shrink-0"
               >
                 Chain:
               </label>
@@ -205,7 +205,7 @@ export default function Home() {
                 id="chain-selector"
                 value={chainId}
                 onChange={handleChainChange}
-                className="chain-selector"
+                className="chain-selector flex-1 sm:flex-initial"
               >
                 {networks?.map((network) => (
                   <option key={network.id} value={network.id}>
@@ -216,11 +216,11 @@ export default function Home() {
             </div>
           )}
           {!isConnected ? (
-            <button onClick={login} className="primary">
+            <button onClick={login} className="primary w-full sm:w-auto">
               Connect my wallet
             </button>
           ) : (
-            <button onClick={logout} className="secondary">
+            <button onClick={logout} className="secondary w-full sm:w-auto">
               Disconnect
             </button>
           )}
