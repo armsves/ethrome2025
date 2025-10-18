@@ -5,7 +5,7 @@ function withValidProperties(properties: Record<string, undefined | string | str
 }
 
 export async function GET() {
-  const URL = process.env.NEXT_PUBLIC_URL as string;
+  const URL = process.env.NEXT_PUBLIC_URL || "https://ethrome2025.vercel.app";
 
   const manifest = {
     "accountAssociation": {
@@ -19,25 +19,15 @@ export async function GET() {
     miniapp: {
       version: "1",
       name: "iExec DataProtector Mini App",
-      homeUrl: URL || "https://your-domain.com",
-      iconUrl: `${URL}/icon.png`,
-      splashImageUrl: `${URL}/splash.png`,
+      homeUrl: URL,
       splashBackgroundColor: "#F4F7FC",
-      webhookUrl: `${URL}/api/webhook`,
-      subtitle: "Secure data protection on-chain",
+      subtitle: "Secure data protection",
       description: "Protect your data with iExec DataProtector. Encrypt, store, and grant access to your data securely on the blockchain.",
-      screenshotUrls: [
-        `${URL}/screenshot1.png`,
-        `${URL}/screenshot2.png`,
-        `${URL}/screenshot3.png`
-      ],
       primaryCategory: "social",
       tags: ["iexec", "dataprotector", "privacy", "blockchain"],
-      heroImageUrl: `${URL}/hero.png`,
       tagline: "Protect data instantly",
       ogTitle: "iExec DataProtector Mini App",
       ogDescription: "Secure and grant access to your encrypted data on-chain.",
-      ogImageUrl: `${URL}/og-image.png`,
       noindex: true // Set to false when ready for production
     }
   };
