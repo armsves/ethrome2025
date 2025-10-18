@@ -9,6 +9,7 @@ import {
   ProtectedData,
   GrantedAccess,
 } from "@iexec/dataprotector";
+import { sdk } from '@farcaster/miniapp-sdk';
 import WelcomeBlock from "@/components/WelcomeBlock";
 import wagmiNetworks, { explorerSlugs } from "@/config/wagmiNetworks";
 
@@ -106,6 +107,11 @@ export default function Home() {
     if (!address) return `https://explorer.iex.ec/${explorerSlug}/${type}`;
     return `https://explorer.iex.ec/${explorerSlug}/${type}/${address}`;
   };
+
+  // Signal to Base app that the mini app is ready
+  useEffect(() => {
+    sdk.actions.ready();
+  }, []);
 
   useEffect(() => {
     const initializeDataProtector = async () => {
