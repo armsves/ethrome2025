@@ -229,13 +229,13 @@ export default function Home() {
 
       <WelcomeBlock />
 
-      <section className="p-8 bg-[#F4F7FC] rounded-xl">
+      <section className="p-4 sm:p-6 md:p-8 bg-[#F4F7FC] rounded-xl overflow-hidden">
         {isConnected ? (
           <div>
-            <h2 className="mb-6 text-2xl font-semibold text-gray-800">
+            <h2 className="mb-4 sm:mb-6 text-xl sm:text-2xl font-semibold text-gray-800">
               Protect my data
             </h2>
-            <form onSubmit={protectData} className="mb-8">
+            <form onSubmit={protectData} className="mb-6 sm:mb-8">
               <div className="mb-5">
                 <label
                   htmlFor="data_name"
@@ -290,15 +290,15 @@ export default function Home() {
             </form>
 
             {protectedData && (
-              <div className="bg-blue-100 border border-blue-300 rounded-xl p-6 mt-6">
-                <h3 className="text-blue-800 mb-4 text-lg font-semibold">
+              <div className="bg-blue-100 border border-blue-300 rounded-xl p-4 sm:p-6 mt-4 sm:mt-6">
+                <h3 className="text-blue-800 mb-3 sm:mb-4 text-base sm:text-lg font-semibold">
                   ✅ Data protected successfully!
                 </h3>
-                <div className="text-blue-800 space-y-2 text-sm">
+                <div className="text-blue-800 space-y-2 text-xs sm:text-sm">
                   <p>
                     <strong>Name:</strong> {protectedData.name}
                   </p>
-                  <p>
+                  <p className="break-all">
                     <strong>Address:</strong> {protectedData.address}
                     {getExplorerUrl(protectedData.address, "dataset") && (
                       <a
@@ -311,7 +311,7 @@ export default function Home() {
                       </a>
                     )}
                   </p>
-                  <p>
+                  <p className="break-all">
                     <strong>Owner:</strong> {protectedData.owner}
                     {getExplorerUrl(protectedData.owner, "address") && (
                       <a
@@ -330,12 +330,12 @@ export default function Home() {
             )}
 
             {/* Grant Access Form */}
-            <div className="mt-12 pt-8 border-t border-gray-200">
-              <h2 className="mb-6 text-2xl font-semibold text-gray-800">
+            <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-gray-200">
+              <h2 className="mb-4 sm:mb-6 text-xl sm:text-2xl font-semibold text-gray-800">
                 Grant Access to Protected Data
               </h2>
-              <form onSubmit={grantDataAccess} className="mb-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <form onSubmit={grantDataAccess} className="mb-6 sm:mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   <div>
                     <label
                       htmlFor="protected_data_address"
@@ -369,7 +369,7 @@ export default function Home() {
                         }))
                       }
                       disabled={!protectedData?.address}
-                      className="mt-1 secondary h-9"
+                      className="mt-1 secondary h-9 text-xs sm:text-sm"
                     >
                       Use previously created Protected Data
                     </button>
@@ -408,7 +408,7 @@ export default function Home() {
                         }))
                       }
                       disabled={!address}
-                      className="mt-1 secondary h-9"
+                      className="mt-1 secondary h-9 text-xs sm:text-sm"
                     >
                       Use current wallet address
                     </button>
@@ -463,7 +463,7 @@ export default function Home() {
                             authorizedApp: getCurrentWeb3MailAddress(),
                           }))
                         }
-                        className="mt-2 secondary h-9"
+                        className="mt-2 secondary h-9 text-xs sm:text-sm"
                       >
                         Use Web3Mail Whitelist address for current chain
                       </button>
@@ -539,12 +539,12 @@ export default function Home() {
               </form>
 
               {grantedAccess && (
-                <div className="bg-blue-100 border border-blue-300 rounded-xl p-6 mt-6">
-                  <h3 className="text-blue-800 mb-4 text-lg font-semibold">
+                <div className="bg-blue-100 border border-blue-300 rounded-xl p-4 sm:p-6 mt-4 sm:mt-6">
+                  <h3 className="text-blue-800 mb-3 sm:mb-4 text-base sm:text-lg font-semibold">
                     ✅ Access granted successfully!
                   </h3>
-                  <div className="text-blue-800 space-y-2 text-sm">
-                    <p>
+                  <div className="text-blue-800 space-y-2 text-xs sm:text-sm">
+                    <p className="break-all">
                       <strong>Protected Data:</strong> {grantedAccess.dataset}
                       {getExplorerUrl(grantedAccess.dataset, "dataset") && (
                         <a
@@ -567,14 +567,14 @@ export default function Home() {
                     <p>
                       <strong>Volume:</strong> {grantedAccess.volume}
                     </p>
-                    <p>
+                    <p className="break-all">
                       <strong>iApp Restrict:</strong> {grantedAccess.apprestrict}
                     </p>
-                    <p>
+                    <p className="break-all">
                       <strong>Workerpool Restrict:</strong>{" "}
                       {grantedAccess.workerpoolrestrict}
                     </p>
-                    <p>
+                    <p className="break-all">
                       <strong>Requester Restrict:</strong>{" "}
                       {grantedAccess.requesterrestrict}
                       {grantedAccess.requesterrestrict !==
