@@ -2,6 +2,10 @@
 
 A minimal starter to quickly get started with iExec DataProtector and Next.js.
 
+## ZAMA Contract
+
+https://github.com/aeither/fhevm-hardhat-template
+
 ---
 
 ## 📋 About
