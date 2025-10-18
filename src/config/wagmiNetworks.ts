@@ -2,9 +2,10 @@ import {
   type AppKitNetwork,
   arbitrumSepolia,
   arbitrum,
+  base,
 } from '@reown/appkit/networks';
 
-export { arbitrumSepolia, arbitrum } from '@reown/appkit/networks';
+export { arbitrumSepolia, arbitrum, base } from '@reown/appkit/networks';
 
 export const bellecour: AppKitNetwork = {
   id: 0x86,
@@ -38,6 +39,7 @@ const wagmiNetworks = {
   bellecour,
   arbitrumSepolia,
   arbitrum,
+  base,
 };
 
 export default wagmiNetworks;

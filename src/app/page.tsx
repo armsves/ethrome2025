@@ -189,7 +189,7 @@ export default function Home() {
       <nav className="bg-[#F4F7FC] rounded-xl p-3 sm:p-4 mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex items-center gap-4 sm:gap-6 w-full sm:w-auto">
           <div className="font-mono text-lg sm:text-xl font-bold text-gray-800 truncate">
-            iExec NextJs Starter
+            iExec NextJs Starterr
           </div>
         </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">

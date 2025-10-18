@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@coinbase/onchainkit": "^1.1.1",
     "@farcaster/miniapp-sdk": "^0.2.1",
     "@iexec/dataprotector": "^2.0.0-beta.19",
     "@reown/appkit": "^1.7.20",
