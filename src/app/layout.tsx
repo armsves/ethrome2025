@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const URL = process.env.NEXT_PUBLIC_URL || 'https://your-domain.com';
+  const URL = process.env.NEXT_PUBLIC_URL || 'https://ethrome2025.vercel.app';
 
   return {
     title: "iExec DataProtector Mini App",
