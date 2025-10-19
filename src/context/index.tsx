@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React, { type ReactNode } from 'react'
 import { WagmiProvider, type Config } from 'wagmi'
 import { OnchainKitProvider } from '@coinbase/onchainkit'
-//import { base } from '@/config/wagmiNetworks'
+import { base } from '@/config/wagmiNetworks'
 
 // Set up queryClient
 const queryClient = new QueryClient()
