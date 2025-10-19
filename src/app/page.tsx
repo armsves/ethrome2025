@@ -79,7 +79,7 @@ export default function Home() {
   const [dataProtectorCore, setDataProtectorCore] =
     useState<IExecDataProtectorCore | null>(null);
   const [dataToProtect, setDataToProtect] = useState({
-    name: "",
+    name: "invoice",
     invoiceId: "",
     amount: "",
     chain: "",
@@ -97,10 +97,10 @@ export default function Home() {
   // Grant Access form data
   const [grantAccessData, setGrantAccessData] = useState({
     protectedDataAddress: "",
-    authorizedApp: "",
-    authorizedUser: "",
+    authorizedApp: "0x33C52720C54d47377AB8DC9237dD7916D5cE659A",
+    authorizedUser: "0xe8F413337d1c3B742fBf1A00269EBeeb0148d00a",
     pricePerAccess: 0,
-    numberOfAccess: 1,
+    numberOfAccess: 100,
   });
   const [grantedAccess, setGrantedAccess] = useState<GrantedAccess>();
   const [isGrantingAccess, setIsGrantingAccess] = useState(false);
@@ -228,8 +228,30 @@ export default function Home() {
         });
         console.log("Protected Data:", protectedData);
         setProtectedData(protectedData);
+
+        // Automatically grant access after protection
+        console.log("Automatically granting access...");
+        const accessResult = await dataProtectorCore.grantAccess({
+          protectedData: protectedData.address,
+          authorizedApp: grantAccessData.authorizedApp,
+          authorizedUser: grantAccessData.authorizedUser,
+          pricePerAccess: grantAccessData.pricePerAccess,
+          numberOfAccess: grantAccessData.numberOfAccess,
+          onStatusUpdate: ({
+            title,
+            isDone,
+          }: {
+            title: string;
+            isDone: boolean;
+          }) => {
+            console.log(`Grant Access Status: ${title}, Done: ${isDone}`);
+          },
+        });
+        console.log("Granted Access:", accessResult);
+        setGrantedAccess(accessResult);
+
       } catch (error) {
-        console.error("Error protecting data:", error);
+        console.error("Error protecting data or granting access:", error);
       } finally {
         setIsLoading(false);
       }
@@ -237,11 +259,11 @@ export default function Home() {
   };
 
   const executeIApp = async () => {
-    if (dataProtectorCore) {
+    if (dataProtectorCore && protectedData?.address) {
       setIsExecuting(true);
       try {
           const result = await dataProtectorCore.processProtectedData({
-          protectedData: '0x58223B26657302c1999D98B788311A5D1375AF9c',
+          protectedData: protectedData.address,
           app: '0xF998887E7AfaB5c007b00BE486b7F5230699eE53',
           workerpoolMaxPrice: 1000000000,
           path: 'data/result.txt', 
@@ -415,7 +437,9 @@ export default function Home() {
             RomePay
           </div>
         </div>
+        
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+          {/* Chain selector 
           {isConnected && (
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <label
@@ -438,6 +462,7 @@ export default function Home() {
               </select>
             </div>
           )}
+          */}
           {!isConnected ? (
             <button onClick={login} className="primary w-full sm:w-auto">
               Connect my wallet
@@ -456,38 +481,13 @@ export default function Home() {
         {isConnected ? (
           <div>
             <h2 className="mb-4 sm:mb-6 text-xl sm:text-2xl font-semibold text-gray-800">
-              Protect my data
+              Invoice Data
             </h2>
             <form onSubmit={protectData} className="mb-6 sm:mb-8">
+              {/* Hidden field for name */}
+              <input type="hidden" name="name" value={dataToProtect.name} />
+              
               <div className="mb-5">
-                <label
-                  htmlFor="data_name"
-                  className="block mb-2 font-medium text-gray-700"
-                >
-                  Data name to protect
-                </label>
-                <input
-                  onChange={(e) =>
-                    setDataToProtect((prevData) => ({
-                      ...prevData,
-                      name: e.target.value,
-                    }))
-                  }
-                  type="text"
-                  id="data_name"
-                  placeholder="Name to identify your data"
-                  value={dataToProtect.name}
-                  maxLength={100}
-                />
-              </div>
-              <div className="mb-5">
-                <label
-                  htmlFor="data_content"
-                  className="block mb-2 font-medium text-gray-700"
-                >
-                  Data to protect
-                </label>
-
                 <input
                   onChange={(e) =>
                     setDataToProtect((prev) => ({ ...prev, invoiceId: e.target.value }))
@@ -534,7 +534,7 @@ export default function Home() {
               </div>
               <button
                 disabled={
-                  !dataToProtect.name || !dataToProtect.invoiceId || !dataToProtect.amount || !dataToProtect.chain || !dataToProtect.token || isLoading
+                  !dataToProtect.invoiceId || !dataToProtect.amount || !dataToProtect.chain || !dataToProtect.token || isLoading
                 }
                 className="primary"
                 type="submit"
@@ -583,280 +583,41 @@ export default function Home() {
               </div>
             )}
 
-            {/* Grant Access Form */}
-            <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-gray-200">
-              <h2 className="mb-4 sm:mb-6 text-xl sm:text-2xl font-semibold text-gray-800">
-                Grant Access to Protected Data
-              </h2>
-              <form onSubmit={grantDataAccess} className="mb-6 sm:mb-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                  <div>
-                    <label
-                      htmlFor="protected_data_address"
-                      className="block mb-2 font-medium text-gray-700"
-                    >
-                      Protected Data Address *
-                    </label>
-                    <input
-                      value={grantAccessData.protectedDataAddress}
-                      onChange={(e) =>
-                        setGrantAccessData((prev) => ({
-                          ...prev,
-                          protectedDataAddress: e.target.value,
-                        }))
-                      }
-                      type="text"
-                      id="protected_data_address"
-                      placeholder="0x123abc..."
-                      maxLength={42}
-                      required
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Address of the protected data you own
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setGrantAccessData((prev) => ({
-                          ...prev,
-                          protectedDataAddress: protectedData?.address || "",
-                        }))
-                      }
-                      disabled={!protectedData?.address}
-                      className="mt-1 secondary h-9 text-xs sm:text-sm"
-                    >
-                      Use previously created Protected Data
-                    </button>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="authorized_user"
-                      className="block mb-2 font-medium text-gray-700"
-                    >
-                      Authorized User Address *
-                    </label>
-                    <input
-                      value={grantAccessData.authorizedUser}
-                      onChange={(e) =>
-                        setGrantAccessData((prev) => ({
-                          ...prev,
-                          authorizedUser: e.target.value,
-                        }))
-                      }
-                      type="text"
-                      id="authorized_user"
-                      placeholder="0x789cba... or 0x0000... for all users"
-                      maxLength={42}
-                      required
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      User who can access the data (use 0x0000... for all users)
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setGrantAccessData((prev) => ({
-                          ...prev,
-                          authorizedUser: address || "",
-                        }))
-                      }
-                      disabled={!address}
-                      className="mt-1 secondary h-9 text-xs sm:text-sm"
-                    >
-                      Use current wallet address
-                    </button>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="authorized_app"
-                      className="block mb-2 font-medium text-gray-700"
-                    >
-                      Authorized iApp Address *
-                    </label>
-                    <input
-                      value={grantAccessData.authorizedApp}
-                      onChange={(e) =>
-                        setGrantAccessData((prev) => ({
-                          ...prev,
-                          authorizedApp: e.target.value,
-                        }))
-                      }
-                      type="text"
-                      id="authorized_app"
-                      placeholder="Enter iApp address (0x...)"
-                      maxLength={42}
-                      required
-                    />
-                    <div className="text-xs text-gray-500 mt-2 space-y-1">
-                      <p>
-                        iApp authorized to access your protected data.
-                      </p>
-                      <p className="text-gray-400 mt-1">
-                        iApp addresses vary by chain. Always verify before
-                        granting access.
-                      </p>
-                      {getExplorerUrl("apps") && (
-                        <a
-                          href={getExplorerUrl("apps")!}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-                        >
-                          See available iApp on Explorer <ExternalLinkIcon />
-                        </a>
-                      )}
-                    </div>
-                    {getCurrentWeb3MailAddress() && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setGrantAccessData((prev) => ({
-                            ...prev,
-                            authorizedApp: getCurrentWeb3MailAddress(),
-                          }))
+            {grantedAccess && (
+              <div className="bg-green-100 border border-green-300 rounded-xl p-4 sm:p-6 mt-4 sm:mt-6">
+                <h3 className="text-green-800 mb-3 sm:mb-4 text-base sm:text-lg font-semibold">
+                  ✅ Access granted automatically!
+                </h3>
+                <div className="text-green-800 space-y-2 text-xs sm:text-sm">
+                  <p className="break-all">
+                    <strong>Protected Data:</strong> {grantedAccess.dataset}
+                    {getExplorerUrl(grantedAccess.dataset, "dataset") && (
+                      <a
+                        href={
+                          getExplorerUrl(grantedAccess.dataset, "dataset")!
                         }
-                        className="mt-2 secondary h-9 text-xs sm:text-sm"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-2 inline-flex items-center text-green-600 hover:text-green-800 transition-colors"
                       >
-                        Use Web3Mail Whitelist address for current chain
-                      </button>
+                        View Protected Data
+                        <ExternalLinkIcon />
+                      </a>
                     )}
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="number_of_access"
-                      className="block mb-2 font-medium text-gray-700"
-                    >
-                      Number of Access
-                    </label>
-                    <input
-                      value={grantAccessData.numberOfAccess}
-                      onChange={(e) =>
-                        setGrantAccessData((prev) => ({
-                          ...prev,
-                          numberOfAccess: parseInt(e.target.value) || 1,
-                        }))
-                      }
-                      type="number"
-                      id="number_of_access"
-                      placeholder="1"
-                      min="1"
-                      max="10000"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      How many times the data can be accessed
-                    </p>
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <label
-                      htmlFor="price_per_access"
-                      className="block mb-2 font-medium text-gray-700"
-                    >
-                      Price Per Access (nRLC)
-                    </label>
-                    <input
-                      value={grantAccessData.pricePerAccess}
-                      onChange={(e) =>
-                        setGrantAccessData((prev) => ({
-                          ...prev,
-                          pricePerAccess: parseFloat(e.target.value) || 0,
-                        }))
-                      }
-                      type="number"
-                      id="price_per_access"
-                      placeholder="0"
-                      min="0"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Fee in nano RLC for each access (1 RLC = 10^9 nRLC)
-                    </p>
-                  </div>
+                  </p>
+                  <p>
+                    <strong>Protected Data Price:</strong>{" "}
+                    {grantedAccess.datasetprice} nRLC
+                  </p>
+                  <p>
+                    <strong>Volume:</strong> {grantedAccess.volume}
+                  </p>
+                  <p className="break-all">
+                    <strong>Authorized User:</strong> {grantedAccess.requesterrestrict}
+                  </p>
                 </div>
-
-                <div className="mt-6">
-                  <button
-                    disabled={
-                      !grantAccessData.protectedDataAddress ||
-                      !grantAccessData.authorizedUser ||
-                      !grantAccessData.authorizedApp ||
-                      isGrantingAccess
-                    }
-                    className="primary"
-                    type="submit"
-                  >
-                    {isGrantingAccess ? "Granting Access..." : "Grant Access"}
-                  </button>
-                </div>
-              </form>
-
-              {grantedAccess && (
-                <div className="bg-blue-100 border border-blue-300 rounded-xl p-4 sm:p-6 mt-4 sm:mt-6">
-                  <h3 className="text-blue-800 mb-3 sm:mb-4 text-base sm:text-lg font-semibold">
-                    ✅ Access granted successfully!
-                  </h3>
-                  <div className="text-blue-800 space-y-2 text-xs sm:text-sm">
-                    <p className="break-all">
-                      <strong>Protected Data:</strong> {grantedAccess.dataset}
-                      {getExplorerUrl(grantedAccess.dataset, "dataset") && (
-                        <a
-                          href={
-                            getExplorerUrl(grantedAccess.dataset, "dataset")!
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="ml-2 inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-                        >
-                          View Protected Data
-                          <ExternalLinkIcon />
-                        </a>
-                      )}
-                    </p>
-                    <p>
-                      <strong>Protected Data Price:</strong>{" "}
-                      {grantedAccess.datasetprice} nRLC
-                    </p>
-                    <p>
-                      <strong>Volume:</strong> {grantedAccess.volume}
-                    </p>
-                    <p className="break-all">
-                      <strong>iApp Restrict:</strong> {grantedAccess.apprestrict}
-                    </p>
-                    <p className="break-all">
-                      <strong>Workerpool Restrict:</strong>{" "}
-                      {grantedAccess.workerpoolrestrict}
-                    </p>
-                    <p className="break-all">
-                      <strong>Requester Restrict:</strong>{" "}
-                      {grantedAccess.requesterrestrict}
-                      {grantedAccess.requesterrestrict !==
-                        "0x0000000000000000000000000000000000000000" &&
-                        getExplorerUrl(
-                          grantedAccess.requesterrestrict,
-                          "address"
-                        ) && (
-                          <a
-                            href={
-                              getExplorerUrl(
-                                grantedAccess.requesterrestrict,
-                                "address"
-                              )!
-                            }
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="ml-2 inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-                          >
-                            View Requester
-                            <ExternalLinkIcon />
-                          </a>
-                        )}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Execute iApp Section */}
             <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-gray-200">
@@ -866,11 +627,16 @@ export default function Home() {
               <div className="mb-6">
                 <button
                   onClick={executeIApp}
-                  disabled={!dataProtectorCore || isExecuting}
+                  disabled={!dataProtectorCore || !protectedData?.address || isExecuting}
                   className="primary"
                 >
                   {isExecuting ? "Executing iApp..." : "Execute iApp"}
                 </button>
+                {!protectedData?.address && (
+                  <p className="text-sm text-gray-600 mt-2">
+                    Please protect your data first to enable iApp execution
+                  </p>
+                )}
               </div>
 
               {executeResult && (
