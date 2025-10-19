@@ -1,0 +1,164 @@
+[
+  {
+    "app": "0x33C52720C54d47377AB8DC9237dD7916D5cE659A",
+    "dealid": "0x15ac75e73cfa8fcf6d3f881eb83d19bcbc98576fd5f0806d9aae31958f6573e5",
+    "taskids": [
+      "0xdb04ad4f727fb7408dc856857e53af560b1c5555978a884107f5d8f4d4f55b41"
+    ],
+    "txHash": "0xd5f307327ee42f7c77ed2f8df71180cbcc31ffcade047a3317761e0fcc32f092",
+    "date": "2025-10-18T23:48:04.766Z"
+  },
+  {
+    "app": "0x33C52720C54d47377AB8DC9237dD7916D5cE659A",
+    "dealid": "0xb7d71a59ed827dfa52e1f7f10f350eb76a3243a45763fc806df9939a4d2200e2",
+    "taskids": [
+      "0xe143141eceec1996d7ce5e72515a5afef72d0a939e7bc57852775573f805a8af"
+    ],
+    "txHash": "0xdb4bdb27f090826d99637bbffa1e873afcd4fd3bb060d164287989162c5fbd68",
+    "date": "2025-10-18T23:46:05.501Z"
+  },
+  {
+    "app": "0xF998887E7AfaB5c007b00BE486b7F5230699eE53",
+    "dealid": "0xc51b8010e5f438886920f5d60a49e6e7b77278658a5ad4c41bb468c522740a4c",
+    "taskids": [
+      "0x88328f20c38dd93709083bb19944b3d847e73fc527814ab642c8a155fe8c2535"
+    ],
+    "txHash": "0x96b0003aa0b101233f8d61d0dda872e3279e528fe62169dbad4ee29714196f9e",
+    "date": "2025-10-18T18:34:51.458Z"
+  },
+  {
+    "app": "0xD3405b986E35b8FC844C8E6BBcBEe411C984829e",
+    "dealid": "0x3f57f082dbd8334ab874f314914154cc591dfba56e6748bfcedab4c5094c486c",
+    "taskids": [
+      "0xab2550306d64f3c38eaa00e1dec3914a39402f1b227e5b3f79d909d12e4388a1"
+    ],
+    "txHash": "0x62592586e65136d6a97680f9e24c3e1777958fba1e509cd5c2a30ea6e36b2898",
+    "date": "2025-10-18T18:29:21.678Z"
+  },
+  {
+    "app": "0x7Abd513b7f7E3F1C4de4C887506c27B4CA700E96",
+    "dealid": "0xf1ec811b8faa47164b31d21d408c0aed75f00745e7d229aa2da466f4b67c1b74",
+    "taskids": [
+      "0x3af31cade54bff7a7b1b7beaf7d6da406224f74927b857e69d4ce47c9caf7e44"
+    ],
+    "txHash": "0x04918b43ec22f10fa4e330d8477a221c96e3a316cce0346057b9ee44e02e3187",
+    "date": "2025-10-18T18:20:16.497Z"
+  },
+  {
+    "app": "0x0AfAE8903027E254ccE1c08cd5e92384edc85223",
+    "dealid": "0xdcf9ef81fcb35e0f02493618407544261bf1a2c0408b488c45e67a42ae44b77c",
+    "taskids": [
+      "0xac4334443143347216957e39ab8beec51cb37677a4c2c2b99eb5201ab5a8a2d1"
+    ],
+    "txHash": "0x30cb33fb7590d57c0bd3315ea82be642553eb0a7ed3b9e96b4ec3c377d6d7191",
+    "date": "2025-10-18T18:04:33.374Z"
+  },
+  {
+    "app": "0x0AfAE8903027E254ccE1c08cd5e92384edc85223",
+    "dealid": "0xc69162f8fe5a8a476a4354f3eee29010f8996a95fc6d94462bb855ff262d6c8e",
+    "taskids": [
+      "0x38231201296e038ee770520d61e48c123cf857a3251b183d1f70206d92e4374d"
+    ],
+    "txHash": "0x02788cb5f1ce7fe1b5b3eace9a1b2e3c4d2e6c34783be5c599b9b85052c68885",
+    "date": "2025-10-18T18:00:33.376Z"
+  },
+  {
+    "app": "0x0AfAE8903027E254ccE1c08cd5e92384edc85223",
+    "dealid": "0x99c2ffeb3463be48008851ddb3bec384f2265a2eec82141ce7d1f782e9dc3779",
+    "taskids": [
+      "0x9a2f00e5de6b293d09591d540e93daeda8625b4ca57df8a5f0d1207597cd290f"
+    ],
+    "txHash": "0x4b873bcd0f75dd67adae6a90c8cea83154eacc3bf59a89261bb7d3e7e0c50667",
+    "date": "2025-10-18T17:45:01.456Z"
+  },
+  {
+    "app": "0x0AfAE8903027E254ccE1c08cd5e92384edc85223",
+    "dealid": "0xa9c7fb54449ede0342fbee284db40837ed92eaf8201633933dbad93a5eb2e0b5",
+    "taskids": [
+      "0x1f7790c9c291366b1b81604a8db692454cb3145369604fb74f54f7b0329bd48b"
+    ],
+    "txHash": "0xed485a60b17ffe0d3661141cd8f45d793c8a850ee13f3b5e9fb6fe44ecbeef4c",
+    "date": "2025-10-18T17:40:20.607Z"
+  },
+  {
+    "app": "0xf1305f3A9c0A3A0de8F1D8558E6130F2838BF520",
+    "dealid": "0x27cee5f786510f4722e31a8cff9d5c08396c6e2235c0eb2ca2dcac6b77a9d59f",
+    "taskids": [
+      "0x6b8b7fe10e7df08238a36f32a688037f8849cfe4f1b8a48f564aaecfcf5dff7b"
+    ],
+    "txHash": "0xc519171cddce7a32b67bf7474db56611426578592b3f5379d1f3e0fed05006da",
+    "date": "2025-10-18T17:01:54.190Z"
+  },
+  {
+    "app": "0x056C18527218031cC7E1Aed9472eFc9FEAdfDe46",
+    "dealid": "0xfebb2e2e9ae0b4c4b307d66effd5125cc2c1779429189ced21afba0753555768",
+    "taskids": [
+      "0x0c17f41f68cb95f6ae3ea6e6396366c8a16f556fca50b16b6e039e47ceabf499"
+    ],
+    "txHash": "0xf9b8b410f632aa9e95344545d741ec202ed01cfff6aa0ef9776bc32bfe668829",
+    "date": "2025-10-18T16:33:07.406Z"
+  },
+  {
+    "app": "0x1D5bc03A06A04267ec59a5abD81451ff437d9936",
+    "dealid": "0xfd5bc2698104a3d17ef38c5afb80596efb83bdf5dfcf285069043899d85a6e16",
+    "taskids": [
+      "0x8d38e1b54d0d38bda95928300aafdb302c01c288682628fb7192a74e6152771b"
+    ],
+    "txHash": "0x76d0dee5d7a60d1f659b5903828238011b70cdae5e9626f512d8ea059d9f36cc",
+    "date": "2025-10-18T16:26:50.633Z"
+  },
+  {
+    "app": "0x1D5bc03A06A04267ec59a5abD81451ff437d9936",
+    "dealid": "0x390f76d7c49cd03d8fc496c75e662b38cfbbca1a92eda6afb447d60e0d38fe53",
+    "taskids": [
+      "0x9db9210d19aac23f7d2472c33adf481c52fafa6b1dc0be821a09c9c8e8f9f290"
+    ],
+    "txHash": "0x931b017f9a6bd56a0a566e02e9e78b1740dae6110a62fa4287ef6994146b0dc2",
+    "date": "2025-10-18T16:06:27.923Z"
+  },
+  {
+    "app": "0x30de2d3501d4eA96E226E6Dfe3C0cc8C45bb04aD",
+    "dealid": "0xc197723cb982e4e2ec39be5086e1ff8a1e115c4568ad58889d71118470cc8543",
+    "taskids": [
+      "0x733baa3986c39281a2c1a54d77ee7f00e1cada4ad23f25696727ef75821f1515"
+    ],
+    "txHash": "0x5fa075fba0a264211d251671f950db89e42b190368cf8a2b78adbf01bae43d6c",
+    "date": "2025-10-18T15:51:41.934Z"
+  },
+  {
+    "app": "0x30de2d3501d4eA96E226E6Dfe3C0cc8C45bb04aD",
+    "dealid": "0x7e9cc466a21140ddbace0824f1860b674e7c303011b228872551c1298b92b58d",
+    "taskids": [
+      "0x3ed2f77ef771aafeb057f925c3dc3e18e3c29606099c972f46c3aefc095d4165"
+    ],
+    "txHash": "0xd0d7a024a3cb39ed09fa7191dcad6d561361776082d230ef96bd0a9c52ac68ba",
+    "date": "2025-10-18T15:47:29.098Z"
+  },
+  {
+    "app": "0xd9fE955Ec107ba831201dB6799F37C4731c8B207",
+    "dealid": "0x0b906ab5751ca0b07d0430f989d0fc40ed5c681fc0056b0739fc744177cf7f4a",
+    "taskids": [
+      "0x469ccc5ce767083c4737fc1a0512281fcef4d70b60e7ae0d4cf3ca31bb62a7fa"
+    ],
+    "txHash": "0x153eeff89e601fc5e62fc47609ace3ed6efa2c3bccccc5e2a6db0bddd6aeb338",
+    "date": "2025-10-18T14:07:41.079Z"
+  },
+  {
+    "app": "0xB8FE448942840A5749Be6571bB581e905370ea15",
+    "dealid": "0x9064c081285de690d791d9eae3064042f225aaf83eae24f37f0be1fe40c7b24f",
+    "taskids": [
+      "0x2af8988825e823d9c28c2ebbf89bb1f2f8b767f758bfb75b2a8dca82a523f649"
+    ],
+    "txHash": "0x3e52ca6f29d51e228d8f83b19ec315d1d892753a3b7711f23981cf79ae75f88f",
+    "date": "2025-10-18T13:43:01.708Z"
+  },
+  {
+    "app": "0xB8FE448942840A5749Be6571bB581e905370ea15",
+    "dealid": "0x2a6b25ce05fca83c014ea3a1d04a6543274c54e71dc9141a689236a71f7d3f81",
+    "taskids": [
+      "0x95155f0071c738b6c0f74f804890735f6df4a41f43824c0c77d1ad8880d38f2f"
+    ],
+    "txHash": "0x1c2393b6129503c3da4da3451272997f7565b81cd4dcb1e6a1afc4db7e7a6939",
+    "date": "2025-10-18T12:18:24.919Z"
+  }
+]

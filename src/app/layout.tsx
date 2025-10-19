@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const URL = process.env.NEXT_PUBLIC_URL || 'https://ethrome2025.vercel.app';
 
   return {
-    title: "iExec DataProtector Mini App",
+    title: "RomePay",
     description: "Protect your data with iExec DataProtector. Encrypt, store, and grant access to your data securely on the blockchain.",
     other: {
       'fc:miniapp': JSON.stringify({

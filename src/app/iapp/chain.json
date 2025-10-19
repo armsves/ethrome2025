@@ -1,0 +1,9 @@
+{
+  "default": "bellecour",
+  "chains": {
+    "mainnet": {},
+    "bellecour": {},
+    "arbitrum-sepolia-testnet":{},
+    "arbitrum-mainnet": {}
+  }
+}

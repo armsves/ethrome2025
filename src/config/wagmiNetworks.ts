@@ -36,10 +36,10 @@ export const explorerSlugs: Record<number, string> = {
 };
 
 const wagmiNetworks = {
-  bellecour,
+  //bellecour,
   arbitrumSepolia,
-  arbitrum,
-  base,
+  //arbitrum,
+  //base,
 };
 
 export default wagmiNetworks;
