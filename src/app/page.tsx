@@ -8,9 +8,12 @@ import {
   IExecDataProtectorCore,
   ProtectedData,
   GrantedAccess,
+  type ProcessProtectedDataResponse,
+  getWeb3Provider,
+  Web3SignerProvider
 } from "@iexec/dataprotector";
 import { sdk } from '@farcaster/miniapp-sdk';
-import WelcomeBlock from "@/components/WelcomeBlock";
+//import WelcomeBlock from "@/components/WelcomeBlock";
 import wagmiNetworks, { explorerSlugs } from "@/config/wagmiNetworks";
 
 // External Link Icon Component
@@ -31,6 +34,41 @@ const ExternalLinkIcon = () => (
   </svg>
 );
 
+// Replace the interfaces at the top with proper types:
+
+interface JsonExtractedFile {
+  content: Record<string, unknown>;
+  type: 'json';
+  rawContent: string;
+}
+
+interface TextExtractedFile {
+  content: string;
+  type: 'text';
+  rawContent: string;
+}
+
+interface ErrorExtractedFile {
+  content: string;
+  type: 'error';
+  rawContent: string;
+}
+
+type ExtractedFile = JsonExtractedFile | TextExtractedFile | ErrorExtractedFile;
+
+interface ExtractedFiles {
+  [filename: string]: ExtractedFile;
+}
+
+interface TaskResult {
+  result: ArrayBuffer | unknown;
+  decodedResult?: string | Record<string, unknown>; // More specific than 'object'
+  rawText?: string;
+  resultType?: 'zip' | 'json' | 'text' | 'binary';
+  hexPreview?: string;
+  [key: string]: unknown;
+}
+
 export default function Home() {
   const { open } = useAppKit();
   const { disconnectAsync } = useDisconnect();
@@ -42,7 +80,10 @@ export default function Home() {
     useState<IExecDataProtectorCore | null>(null);
   const [dataToProtect, setDataToProtect] = useState({
     name: "",
-    data: "",
+    invoiceId: "",
+    amount: "",
+    chain: "",
+    token: "",
   });
   const [protectedData, setProtectedData] = useState<ProtectedData>();
   const [isLoading, setIsLoading] = useState(false);
@@ -63,6 +104,14 @@ export default function Home() {
   });
   const [grantedAccess, setGrantedAccess] = useState<GrantedAccess>();
   const [isGrantingAccess, setIsGrantingAccess] = useState(false);
+
+  // Execute iApp state
+  const [executeResult, setExecuteResult] = useState<ProcessProtectedDataResponse>();
+  const [isExecuting, setIsExecuting] = useState(false);
+
+  // Remove the eslint-disable comments and fix the state types:
+  const [taskResult, setTaskResult] = useState<TaskResult | undefined>();
+  const [extractedFiles, setExtractedFiles] = useState<ExtractedFiles | undefined>();
 
   const networks = Object.values(wagmiNetworks);
 
@@ -117,10 +166,9 @@ export default function Home() {
     const initializeDataProtector = async () => {
       if (isConnected && connector) {
         try {
-          const provider =
-            (await connector.getProvider()) as import("ethers").Eip1193Provider;
+          const provider = (await connector.getProvider()) as import("ethers").Eip1193Provider;
           const dataProtector = new IExecDataProtector(provider, {
-            allowExperimentalNetworks: true,
+            allowExperimentalNetworks: false,
           });
           setDataProtectorCore(dataProtector.core);
         } catch (error) {
@@ -171,7 +219,11 @@ export default function Home() {
         const protectedData = await dataProtectorCore.protectData({
           name: dataToProtect.name,
           data: {
-            email: dataToProtect.data,
+            invoiceId: dataToProtect.invoiceId,
+            amount: dataToProtect.amount,
+            chain: dataToProtect.chain,
+            token: dataToProtect.token,
+            wallet: address || "",
           },
         });
         console.log("Protected Data:", protectedData);
@@ -183,6 +235,177 @@ export default function Home() {
       }
     }
   };
+
+  const executeIApp = async () => {
+    if (dataProtectorCore) {
+      setIsExecuting(true);
+      try {
+          const result = await dataProtectorCore.processProtectedData({
+          protectedData: '0x58223B26657302c1999D98B788311A5D1375AF9c',
+          app: '0xF998887E7AfaB5c007b00BE486b7F5230699eE53',
+          workerpoolMaxPrice: 1000000000,
+          path: 'data/result.txt', 
+          onStatusUpdate: ({ title, isDone }) => {
+            console.log(title, isDone);
+          }
+        });
+        console.log("Execute iApp Result:", result);
+        setExecuteResult(result);
+      } catch (error) {
+        console.error("Error executing iApp:", error);
+      } finally {
+        setIsExecuting(false);
+      }
+    }
+  }
+
+        /*
+        if (!result.taskId) {
+          throw new Error("No taskId returned from processProtectedData");
+        }
+
+        const completedTaskResult = await dataProtectorCore.getResultFromCompletedTask({
+          taskId: result.taskId,
+        });
+        console.log("Task Result:", completedTaskResult);
+
+        // Decode the ArrayBuffer result
+        if (completedTaskResult.result instanceof ArrayBuffer) {
+          try {
+            // Try to decode as UTF-8 text
+            const decoder = new TextDecoder('utf-8');
+            const decodedText = decoder.decode(completedTaskResult.result);
+            console.log("Decoded result as text:", decodedText);
+
+            // Check if it's a ZIP file (starts with "PK")
+            if (decodedText.startsWith('PK')) {
+              console.log("Detected ZIP file");
+
+              // Extract ZIP contents using a simple approach
+              try {
+                await extractZipContents(completedTaskResult.result);
+
+                setTaskResult({
+                  ...completedTaskResult,
+                  decodedResult: 'ZIP file detected - contents extracted below',
+                  rawText: decodedText,
+                  resultType: 'zip'
+                });
+              } catch (zipError) {
+                console.error("Failed to extract ZIP:", zipError);
+                setTaskResult({
+                  ...completedTaskResult,
+                  decodedResult: decodedText,
+                  rawText: decodedText,
+                  resultType: 'text'
+                });
+              }
+            } else {
+              // Try to parse as JSON
+              try {
+                const jsonResult = JSON.parse(decodedText);
+                console.log("Parsed JSON result:", jsonResult);
+                setTaskResult({
+                  ...completedTaskResult,
+                  decodedResult: jsonResult,
+                  rawText: decodedText,
+                  resultType: 'json'
+                });
+              } catch (jsonError) {
+                // If not JSON, treat as plain text
+                console.log("Result is plain text, not JSON", jsonError);
+                setTaskResult({
+                  ...completedTaskResult,
+                  decodedResult: decodedText,
+                  rawText: decodedText,
+                  resultType: 'text'
+                });
+              }
+            }
+          } catch (decodeError) {
+            console.error("Failed to decode ArrayBuffer:", decodeError);
+            // If text decoding fails, show as binary data
+            const uint8Array = new Uint8Array(completedTaskResult.result);
+            const hexString = Array.from(uint8Array)
+              .map(byte => byte.toString(16).padStart(2, '0'))
+              .join(' ');
+
+            setTaskResult({
+              ...completedTaskResult,
+              decodedResult: `Binary data (${completedTaskResult.result.byteLength} bytes)`,
+              hexPreview: hexString.substring(0, 200) + (hexString.length > 200 ? '...' : ''),
+              resultType: 'binary'
+            });
+          }
+        } else {
+          setTaskResult(completedTaskResult);
+        }
+
+      } catch (error) {
+        console.error("Error executing iApp:", error);
+      } finally {
+        setIsExecuting(false);
+      }
+    }
+  };
+
+  // Function to extract ZIP contents
+  const extractZipContents = async (zipBuffer: ArrayBuffer) => {
+    try {
+      // Import JSZip dynamically
+      const JSZip = (await import('jszip')).default;
+      const zip = new JSZip();
+
+      const zipContents = await zip.loadAsync(zipBuffer);
+      const files: ExtractedFiles = {}; // Replace 'any' with 'ExtractedFiles'
+
+      // Extract each file
+      for (const [filename, file] of Object.entries(zipContents.files)) {
+        if (!file.dir) {
+          try {
+            const content = await file.async('text');
+            console.log(`Extracted ${filename}:`, content);
+
+            // Try to parse JSON files
+            if (filename.endsWith('.json')) {
+              try {
+                files[filename] = {
+                  content: JSON.parse(content),
+                  type: 'json',
+                  rawContent: content
+                };
+              } catch {
+                files[filename] = {
+                  content: content,
+                  type: 'text',
+                  rawContent: content
+                };
+              }
+            } else {
+              files[filename] = {
+                content: content,
+                type: 'text',
+                rawContent: content
+              };
+            }
+          } catch (error) {
+            console.error(`Error extracting ${filename}:`, error);
+            files[filename] = {
+              content: `Error extracting file: ${error}`,
+              type: 'error',
+              rawContent: ''
+            };
+          }
+        }
+      }
+
+      setExtractedFiles(files);
+      console.log("All extracted files:", files);
+    } catch (error) {
+      console.error("Error extracting ZIP:", error);
+      throw error;
+    }
+  };*/
 
   return (
     <div className="max-w-6xl mx-auto p-3 sm:p-5">
@@ -227,7 +450,7 @@ export default function Home() {
         </div>
       </nav>
 
-      <WelcomeBlock />
+
 
       <section className="p-4 sm:p-6 md:p-8 bg-[#F4F7FC] rounded-xl overflow-hidden">
         {isConnected ? (
@@ -264,23 +487,54 @@ export default function Home() {
                 >
                   Data to protect
                 </label>
+
                 <input
                   onChange={(e) =>
-                    setDataToProtect((prevData) => ({
-                      ...prevData,
-                      data: e.target.value,
-                    }))
+                    setDataToProtect((prev) => ({ ...prev, invoiceId: e.target.value }))
                   }
                   type="text"
-                  id="data_content"
-                  placeholder="Enter text to protect"
-                  value={dataToProtect.data}
-                  maxLength={500}
+                  id="invoice_id"
+                  placeholder="Invoice ID"
+                  value={dataToProtect.invoiceId}
+                  maxLength={200}
+                  className="mb-2"
+                />
+                <input
+                  onChange={(e) =>
+                    setDataToProtect((prev) => ({ ...prev, amount: e.target.value }))
+                  }
+                  type="text"
+                  id="amount"
+                  placeholder="Amount"
+                  value={dataToProtect.amount}
+                  maxLength={200}
+                  className="mb-2"
+                />
+                <input
+                  onChange={(e) =>
+                    setDataToProtect((prev) => ({ ...prev, chain: e.target.value }))
+                  }
+                  type="text"
+                  id="chain"
+                  placeholder="Chain"
+                  value={dataToProtect.chain}
+                  maxLength={200}
+                  className="mb-2"
+                />
+                <input
+                  onChange={(e) =>
+                    setDataToProtect((prev) => ({ ...prev, token: e.target.value }))
+                  }
+                  type="text"
+                  id="token"
+                  placeholder="Token"
+                  value={dataToProtect.token}
+                  maxLength={200}
                 />
               </div>
               <button
                 disabled={
-                  !dataToProtect.name || !dataToProtect.data || isLoading
+                  !dataToProtect.name || !dataToProtect.invoiceId || !dataToProtect.amount || !dataToProtect.chain || !dataToProtect.token || isLoading
                 }
                 className="primary"
                 type="submit"
@@ -599,6 +853,163 @@ export default function Home() {
                           </a>
                         )}
                     </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Execute iApp Section */}
+            <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-gray-200">
+              <h2 className="mb-4 sm:mb-6 text-xl sm:text-2xl font-semibold text-gray-800">
+                Execute iApp
+              </h2>
+              <div className="mb-6">
+                <button
+                  onClick={executeIApp}
+                  disabled={!dataProtectorCore || isExecuting}
+                  className="primary"
+                >
+                  {isExecuting ? "Executing iApp..." : "Execute iApp"}
+                </button>
+              </div>
+
+              {executeResult && (
+                <div className="bg-green-100 border border-green-300 rounded-xl p-4 sm:p-6 mt-4 sm:mt-6">
+                  <h3 className="text-green-800 mb-3 sm:mb-4 text-base sm:text-lg font-semibold">
+                    ✅ iApp executed successfully!
+                  </h3>
+                  <div className="text-green-800 space-y-2 text-xs sm:text-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <strong>Transaction Hash:</strong>
+                        <p className="break-all text-green-700">{executeResult.txHash}</p>
+                      </div>
+                      <div>
+                        <strong>Deal ID:</strong>
+                        <p className="break-all text-green-700">{executeResult.dealId}</p>
+                      </div>
+                      <div>
+                        <strong>Task ID:</strong>
+                        <p className="break-all text-green-700">{executeResult.taskId}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {taskResult && (
+                <div className="bg-blue-100 border border-blue-300 rounded-xl p-4 sm:p-6 mt-4 sm:mt-6">
+                  <h3 className="text-blue-800 mb-3 sm:mb-4 text-base sm:text-lg font-semibold">
+                    📋 Task Result
+                  </h3>
+                  <div className="text-blue-800 space-y-3 text-xs sm:text-sm">
+
+                    {taskResult.resultType === 'zip' && (
+                      <div>
+                        <strong>ZIP File Contents:</strong>
+                        <p className="text-blue-700 mb-3">The result contains a ZIP file with the following files:</p>
+
+                        {extractedFiles && Object.entries(extractedFiles).map(([filename, fileData]: [string, ExtractedFile]) => (
+                          <div key={filename} className="mb-4 bg-blue-50 p-3 rounded">
+                            <h4 className="font-semibold text-blue-900 mb-2">📄 {filename}</h4>
+
+                            {fileData.type === 'json' && (
+                              <div>
+                                <p className="text-blue-700 mb-2">JSON Content:</p>
+                                <pre className="bg-white p-2 rounded text-xs overflow-auto max-h-64 text-blue-900">
+                                  {JSON.stringify(fileData.content, null, 2)}
+                                </pre>
+                              </div>
+                            )}
+
+                            {fileData.type === 'text' && (
+                              <div>
+                                <p className="text-blue-700 mb-2">Text Content:</p>
+                                <pre className="bg-white p-2 rounded text-xs overflow-auto max-h-64 text-blue-900 whitespace-pre-wrap">
+                                  {fileData.content} {/* Now TypeScript knows this is always a string */}
+                                </pre>
+                              </div>
+                            )}
+
+                            {fileData.type === 'error' && (
+                              <div>
+                                <p className="text-red-700 mb-2">Error:</p>
+                                <pre className="bg-red-50 p-2 rounded text-xs text-red-900">
+                                  {fileData.content} {/* Now TypeScript knows this is always a string */}
+                                </pre>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {taskResult.resultType === 'json' && (
+                      <div>
+                        <strong>Processed Data (JSON):</strong>
+                        <pre className="bg-blue-50 p-3 rounded text-xs overflow-auto mt-2 text-blue-900 max-h-96">
+                          {taskResult.decodedResult
+                            ? JSON.stringify(taskResult.decodedResult, null, 2)
+                            : 'No data available'
+                          }
+                        </pre>
+                      </div>
+                    )}
+
+                    {taskResult.resultType === 'text' && (
+                      <div>
+                        <strong>Processed Data (Text):</strong>
+                        <pre className="bg-blue-50 p-3 rounded text-xs overflow-auto mt-2 text-blue-900 max-h-96 whitespace-pre-wrap">
+                          {typeof taskResult.decodedResult === 'string'
+                            ? taskResult.decodedResult
+                            : JSON.stringify(taskResult.decodedResult || 'No data available', null, 2)
+                          }
+                        </pre>
+                      </div>
+                    )}
+
+                    {taskResult.resultType === 'binary' && (
+                      <div>
+                        <strong>Binary Data:</strong>
+                        <p className="text-blue-700 mb-2">
+                          {typeof taskResult.decodedResult === 'string'
+                            ? taskResult.decodedResult
+                            : 'Binary data detected'
+                          }
+                        </p>
+                        <details className="bg-blue-50 p-3 rounded">
+                          <summary className="cursor-pointer text-blue-900 font-medium">View Hex Data (first 100 bytes)</summary>
+                          <pre className="text-xs mt-2 text-blue-800 overflow-auto">
+                            {taskResult.hexPreview || 'No hex preview available'}
+                          </pre>
+                        </details>
+                      </div>
+                    )}
+
+                    <div>
+                      <strong>Raw Result Info:</strong>
+                      <div className="bg-blue-50 p-3 rounded text-xs mt-2 text-blue-900">
+                        <p>Type: {taskResult.result instanceof ArrayBuffer ? 'ArrayBuffer' : typeof taskResult.result}</p>
+                        {taskResult.result instanceof ArrayBuffer && (
+                          <p>Size: {taskResult.result.byteLength} bytes</p>
+                        )}
+                        {taskResult.resultType === 'zip' && (
+                          <p>Format: ZIP Archive containing {extractedFiles ? Object.keys(extractedFiles).length : 0} files</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <details className="bg-blue-50 rounded">
+                      <summary className="cursor-pointer p-3 text-blue-900 font-medium">View Complete Task Result</summary>
+                      <pre className="p-3 text-xs overflow-auto text-blue-800 max-h-64">
+                        {JSON.stringify({
+                          ...taskResult,
+                          result: taskResult.result instanceof ArrayBuffer
+                            ? `[ArrayBuffer ${taskResult.result.byteLength} bytes]`
+                            : taskResult.result
+                        }, null, 2)}
+                      </pre>
+                    </details>
                   </div>
                 </div>
               )}
