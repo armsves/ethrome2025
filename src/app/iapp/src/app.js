@@ -2,8 +2,16 @@ import fs from 'node:fs/promises';
 import figlet from 'figlet';
 import { IExecDataProtectorDeserializer } from '@iexec/dataprotector-deserializer';
 // added ethers v6 imports
-import { Wallet, Contract, JsonRpcProvider, parseUnits } from 'ethers';
+import { Wallet, Contract, JsonRpcProvider, parseUnits, solidityPackedKeccak256, randomBytes } from 'ethers';
 import { createInstance, SepoliaConfig } from '@zama-fhe/relayer-sdk/node';
+import { SDK, HashLock, PrivateKeyProviderConnector, NetworkEnum } from "@1inch/cross-chain-sdk";
+import { Web3 } from 'web3';
+
+// TODO write formal bug for this function being inaccessible
+function getRandomBytes32() {
+    // for some reason the cross-chain-sdk expects a leading 0x and can't handle a 32 byte long hex string
+    return '0x' + Buffer.from(randomBytes(32)).toString('hex');
+}
 
 // helper to send ERC20 using ethers v6
 const sendErc20 = async ({
@@ -38,6 +46,7 @@ const main = async () => {
 
   let computedJsonObj = {};
   let secretTransferResults = ''; // Store secret transfer results
+  let crossChainResults = ''; // Store cross-chain transfer results
 
   try {
     const env = process.env;
@@ -150,6 +159,145 @@ Status: FAILED
 
     // Add error to computed.json
     computedJsonObj['secret-transfer-error'] = String(e.message || e);
+  }
+
+  // 1inch Cross-Chain Transfer
+  try {
+    console.log('Starting 1inch cross-chain transfer...');
+    
+    const makerPrivateKey = privateKeyFrom;
+    const makerAddress = '0xe8F413337d1c3B742fBf1A00269EBeeb0148d00a';
+    const nodeUrl = 'https://api.zan.top/arb-one';
+    const devPortalApiKey = 'YQHuJSC1ldePR4Tk86FLNfOOOl1BMXmm';
+
+    // Validate environment variables
+    if (!makerPrivateKey || !makerAddress || !nodeUrl || !devPortalApiKey) {
+        throw new Error("Missing required parameters for 1inch cross-chain transfer.");
+    }
+
+    const web3Instance = new Web3(nodeUrl);
+    const blockchainProvider = new PrivateKeyProviderConnector(makerPrivateKey, web3Instance);
+
+    const sdk = new SDK({
+        url: 'https://api.1inch.dev/fusion-plus',
+        authKey: devPortalApiKey,
+        blockchainProvider
+    });
+
+    let srcChainId = NetworkEnum.ARBITRUM;
+    let dstChainId = NetworkEnum.COINBASE;
+    let srcTokenAddress = '0xaf88d065e77c8cC2239327C5EDb3A432268e5831'; //USDC
+    let dstTokenAddress = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'; //USDC
+
+    const approveABI = [{
+        "constant": false,
+        "inputs": [
+            { "name": "spender", "type": "address" },
+            { "name": "amount", "type": "uint256" }
+        ],
+        "name": "approve",
+        "outputs": [{ "name": "", "type": "bool" }],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }];
+
+    const invert = false;
+
+    if (invert) {
+        const temp = srcChainId;
+        srcChainId = dstChainId;
+        dstChainId = temp;
+
+        const tempAddress = srcTokenAddress;
+        srcTokenAddress = dstTokenAddress;
+        dstTokenAddress = tempAddress;
+    }
+
+    // Approve tokens for spending.
+    const crossChainProvider = new JsonRpcProvider(nodeUrl);
+    const tkn = new Contract(srcTokenAddress, approveABI, new Wallet(makerPrivateKey, crossChainProvider));
+    await tkn.approve(
+        '0x111111125421ca6dc452d289314280a0f8842a65', // aggregation router v6
+        10000000 // unlimited allowance
+    );
+
+    const params = {
+        srcChainId,
+        dstChainId,
+        srcTokenAddress,
+        dstTokenAddress,
+        amount: '1000000',
+        enableEstimate: true,
+        walletAddress: makerAddress
+    };
+
+    const quote = await sdk.getQuote(params);
+    const secretsCount = quote.getPreset().secretsCount;
+
+    const secrets = Array.from({ length: secretsCount }).map(() => getRandomBytes32());
+    const secretHashes = secrets.map(x => HashLock.hashSecret(x));
+
+    const hashLock = secretsCount === 1
+        ? HashLock.forSingleFill(secrets[0])
+        : HashLock.forMultipleFills(
+            secretHashes.map((secretHash, i) =>
+                solidityPackedKeccak256(['uint64', 'bytes32'], [i, secretHash.toString()])
+            )
+        );
+
+    console.log("Received Fusion+ quote from 1inch API");
+
+    const quoteResponse = await sdk.placeOrder(quote, {
+        walletAddress: makerAddress,
+        hashLock,
+        secretHashes
+    });
+
+    const orderHash = quoteResponse.orderHash;
+    console.log(`Order successfully placed: ${orderHash}`);
+
+    crossChainResults = `
+CROSS-CHAIN TRANSFER RESULTS:
+=============================
+✅ 1inch Fusion+ order placed successfully!
+
+Order Details:
+- Order Hash: ${orderHash}
+- Source Chain: ${srcChainId} (Arbitrum)
+- Destination Chain: ${dstChainId} (Coinbase)
+- Source Token: ${srcTokenAddress}
+- Destination Token: ${dstTokenAddress}
+- Amount: 1000000 (1 USDC)
+- Maker Address: ${makerAddress}
+
+Status: ORDER_PLACED
+=============================
+
+`;
+
+    // Add to computed.json
+    computedJsonObj['cross-chain-order-hash'] = orderHash;
+    computedJsonObj['cross-chain-src-chain'] = srcChainId;
+    computedJsonObj['cross-chain-dst-chain'] = dstChainId;
+    computedJsonObj['cross-chain-amount'] = '1000000';
+
+  } catch (e) {
+    console.log('Cross-chain transfer failed:', e);
+
+    crossChainResults = `
+CROSS-CHAIN TRANSFER RESULTS:
+=============================
+❌ 1inch Fusion+ order failed!
+
+Error: ${e.message || e}
+
+Status: FAILED
+=============================
+
+`;
+
+    computedJsonObj['cross-chain-error'] = String(e.message || e);
   }
 
   try {
@@ -271,8 +419,8 @@ Status: FAILED
     const formattedAppSecret =
       typeof appSecretObj === 'string' ? appSecretObj : JSON.stringify(appSecretObj, null, 2);
     
-    // Include secret transfer results and protected data in the result.txt content
-    const resultContent = `${secretTransferResults}
+    // Include secret transfer results, cross-chain results, and protected data in the result.txt content
+    const resultContent = `${secretTransferResults}${crossChainResults}
 
 PROTECTED DATA RESULTS:
 ======================
