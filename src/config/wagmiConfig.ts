@@ -2,7 +2,7 @@ import { http } from '@wagmi/core'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { createAppKit } from '@reown/appkit/react';
 import wagmiNetworks from './wagmiNetworks';
-import { AppKitNetwork } from '@reown/appkit/networks';
+//import { AppKitNetwork } from '@reown/appkit/networks';
 import { arbitrumSepolia } from '@reown/appkit/networks'
 
 // Get projectId from https://cloud.reown.com

@@ -7,7 +7,7 @@ import {
 
 export { arbitrumSepolia, 
   //arbitrum, 
-  //base 
+  base 
 } from '@reown/appkit/networks';
 
 /*
