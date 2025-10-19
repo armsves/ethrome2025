@@ -13,6 +13,9 @@ import {
   Web3SignerProvider
 } from "@iexec/dataprotector";
 import { sdk } from '@farcaster/miniapp-sdk';
+import Link from 'next/link';
+import Image from 'next/image'
+
 //import WelcomeBlock from "@/components/WelcomeBlock";
 import wagmiNetworks, { explorerSlugs } from "@/config/wagmiNetworks";
 
@@ -97,7 +100,7 @@ export default function Home() {
   // Grant Access form data
   const [grantAccessData, setGrantAccessData] = useState({
     protectedDataAddress: "",
-    authorizedApp: "0x33C52720C54d47377AB8DC9237dD7916D5cE659A",
+    authorizedApp: "0xF998887E7AfaB5c007b00BE486b7F5230699eE53",
     authorizedUser: "0xe8F413337d1c3B742fBf1A00269EBeeb0148d00a",
     pricePerAccess: 0,
     numberOfAccess: 100,
@@ -430,371 +433,282 @@ export default function Home() {
   };*/
 
   return (
-    <div className="max-w-6xl mx-auto p-3 sm:p-5">
-      <nav className="bg-[#F4F7FC] rounded-xl p-3 sm:p-4 mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex items-center gap-4 sm:gap-6 w-full sm:w-auto">
-          <div className="font-mono text-lg sm:text-xl font-bold text-gray-800 truncate">
-            RomePay
-          </div>
-        </div>
-        
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
-          {/* Chain selector 
-          {isConnected && (
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <label
-                htmlFor="chain-selector"
-                className="text-sm font-medium text-gray-700 shrink-0"
-              >
-                Chain:
-              </label>
-              <select
-                id="chain-selector"
-                value={chainId}
-                onChange={handleChainChange}
-                className="chain-selector flex-1 sm:flex-initial"
-              >
-                {networks?.map((network) => (
-                  <option key={network.id} value={network.id}>
-                    {network.name}
-                  </option>
-                ))}
-              </select>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="max-w-6xl mx-auto p-3 sm:p-5">
+        <nav className="bg-white shadow-lg rounded-xl p-3 sm:p-4 mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 border border-gray-100">
+          <div className="flex items-center justify-between w-full">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden shadow-md">
+                <Image 
+                  src="/RomePay.png" 
+                  alt="RomePay Logo" 
+                  width={56}
+                  height={56}
+                  className="w-full h-full object-cover"
+                  priority
+                />
+              </div>
+            </Link>
+            
+            {/* Centered RomePay text */}
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              <h1 className="font-bold text-xl sm:text-2xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                RomePay
+              </h1>
             </div>
-          )}
-          */}
-          {!isConnected ? (
-            <button onClick={login} className="primary w-full sm:w-auto">
-              Connect my wallet
-            </button>
-          ) : (
-            <button onClick={logout} className="secondary w-full sm:w-auto">
-              Disconnect
-            </button>
-          )}
-        </div>
-      </nav>
-
-
-
-      <section className="p-4 sm:p-6 md:p-8 bg-[#F4F7FC] rounded-xl overflow-hidden">
-        {isConnected ? (
-          <div>
-            <h2 className="mb-4 sm:mb-6 text-xl sm:text-2xl font-semibold text-gray-800">
-              Invoice Data
-            </h2>
-            <form onSubmit={protectData} className="mb-6 sm:mb-8">
-              {/* Hidden field for name */}
-              <input type="hidden" name="name" value={dataToProtect.name} />
-              
-              <div className="mb-5">
-                <input
-                  onChange={(e) =>
-                    setDataToProtect((prev) => ({ ...prev, invoiceId: e.target.value }))
-                  }
-                  type="text"
-                  id="invoice_id"
-                  placeholder="Invoice ID"
-                  value={dataToProtect.invoiceId}
-                  maxLength={200}
-                  className="mb-2"
-                />
-                <input
-                  onChange={(e) =>
-                    setDataToProtect((prev) => ({ ...prev, amount: e.target.value }))
-                  }
-                  type="text"
-                  id="amount"
-                  placeholder="Amount"
-                  value={dataToProtect.amount}
-                  maxLength={200}
-                  className="mb-2"
-                />
-                <input
-                  onChange={(e) =>
-                    setDataToProtect((prev) => ({ ...prev, chain: e.target.value }))
-                  }
-                  type="text"
-                  id="chain"
-                  placeholder="Chain"
-                  value={dataToProtect.chain}
-                  maxLength={200}
-                  className="mb-2"
-                />
-                <input
-                  onChange={(e) =>
-                    setDataToProtect((prev) => ({ ...prev, token: e.target.value }))
-                  }
-                  type="text"
-                  id="token"
-                  placeholder="Token"
-                  value={dataToProtect.token}
-                  maxLength={200}
-                />
-              </div>
-              <button
-                disabled={
-                  !dataToProtect.invoiceId || !dataToProtect.amount || !dataToProtect.chain || !dataToProtect.token || isLoading
-                }
-                className="primary"
-                type="submit"
-              >
-                {isLoading ? "Protecting data..." : "Protect my data"}
-              </button>
-            </form>
-
-            {protectedData && (
-              <div className="bg-blue-100 border border-blue-300 rounded-xl p-4 sm:p-6 mt-4 sm:mt-6">
-                <h3 className="text-blue-800 mb-3 sm:mb-4 text-base sm:text-lg font-semibold">
-                  ✅ Data protected successfully!
-                </h3>
-                <div className="text-blue-800 space-y-2 text-xs sm:text-sm">
-                  <p>
-                    <strong>Name:</strong> {protectedData.name}
-                  </p>
-                  <p className="break-all">
-                    <strong>Address:</strong> {protectedData.address}
-                    {getExplorerUrl(protectedData.address, "dataset") && (
-                      <a
-                        href={getExplorerUrl(protectedData.address, "dataset")!}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="ml-2 inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-                      >
-                        View Protected Data <ExternalLinkIcon />
-                      </a>
-                    )}
-                  </p>
-                  <p className="break-all">
-                    <strong>Owner:</strong> {protectedData.owner}
-                    {getExplorerUrl(protectedData.owner, "address") && (
-                      <a
-                        href={getExplorerUrl(protectedData.owner, "address")!}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="ml-2 inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-                      >
-                        View Address
-                        <ExternalLinkIcon />
-                      </a>
-                    )}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {grantedAccess && (
-              <div className="bg-green-100 border border-green-300 rounded-xl p-4 sm:p-6 mt-4 sm:mt-6">
-                <h3 className="text-green-800 mb-3 sm:mb-4 text-base sm:text-lg font-semibold">
-                  ✅ Access granted automatically!
-                </h3>
-                <div className="text-green-800 space-y-2 text-xs sm:text-sm">
-                  <p className="break-all">
-                    <strong>Protected Data:</strong> {grantedAccess.dataset}
-                    {getExplorerUrl(grantedAccess.dataset, "dataset") && (
-                      <a
-                        href={
-                          getExplorerUrl(grantedAccess.dataset, "dataset")!
-                        }
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="ml-2 inline-flex items-center text-green-600 hover:text-green-800 transition-colors"
-                      >
-                        View Protected Data
-                        <ExternalLinkIcon />
-                      </a>
-                    )}
-                  </p>
-                  <p>
-                    <strong>Protected Data Price:</strong>{" "}
-                    {grantedAccess.datasetprice} nRLC
-                  </p>
-                  <p>
-                    <strong>Volume:</strong> {grantedAccess.volume}
-                  </p>
-                  <p className="break-all">
-                    <strong>Authorized User:</strong> {grantedAccess.requesterrestrict}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Execute iApp Section */}
-            <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-gray-200">
-              <h2 className="mb-4 sm:mb-6 text-xl sm:text-2xl font-semibold text-gray-800">
-                Execute iApp
-              </h2>
-              <div className="mb-6">
-                <button
-                  onClick={executeIApp}
-                  disabled={!dataProtectorCore || !protectedData?.address || isExecuting}
-                  className="primary"
-                >
-                  {isExecuting ? "Executing iApp..." : "Execute iApp"}
+            
+            {/* Connect/Disconnect Button */}
+            <div className="flex items-center">
+              {!isConnected ? (
+                <button onClick={login} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium px-6 py-2.5 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-md">
+                  Connect Wallet
                 </button>
-                {!protectedData?.address && (
-                  <p className="text-sm text-gray-600 mt-2">
-                    Please protect your data first to enable iApp execution
-                  </p>
-                )}
-              </div>
-
-              {executeResult && (
-                <div className="bg-green-100 border border-green-300 rounded-xl p-4 sm:p-6 mt-4 sm:mt-6">
-                  <h3 className="text-green-800 mb-3 sm:mb-4 text-base sm:text-lg font-semibold">
-                    ✅ iApp executed successfully!
-                  </h3>
-                  <div className="text-green-800 space-y-2 text-xs sm:text-sm">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div>
-                        <strong>Transaction Hash:</strong>
-                        <p className="break-all text-green-700">{executeResult.txHash}</p>
-                      </div>
-                      <div>
-                        <strong>Deal ID:</strong>
-                        <p className="break-all text-green-700">{executeResult.dealId}</p>
-                      </div>
-                      <div>
-                        <strong>Task ID:</strong>
-                        <p className="break-all text-green-700">{executeResult.taskId}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {taskResult && (
-                <div className="bg-blue-100 border border-blue-300 rounded-xl p-4 sm:p-6 mt-4 sm:mt-6">
-                  <h3 className="text-blue-800 mb-3 sm:mb-4 text-base sm:text-lg font-semibold">
-                    📋 Task Result
-                  </h3>
-                  <div className="text-blue-800 space-y-3 text-xs sm:text-sm">
-
-                    {taskResult.resultType === 'zip' && (
-                      <div>
-                        <strong>ZIP File Contents:</strong>
-                        <p className="text-blue-700 mb-3">The result contains a ZIP file with the following files:</p>
-
-                        {extractedFiles && Object.entries(extractedFiles).map(([filename, fileData]: [string, ExtractedFile]) => (
-                          <div key={filename} className="mb-4 bg-blue-50 p-3 rounded">
-                            <h4 className="font-semibold text-blue-900 mb-2">📄 {filename}</h4>
-
-                            {fileData.type === 'json' && (
-                              <div>
-                                <p className="text-blue-700 mb-2">JSON Content:</p>
-                                <pre className="bg-white p-2 rounded text-xs overflow-auto max-h-64 text-blue-900">
-                                  {JSON.stringify(fileData.content, null, 2)}
-                                </pre>
-                              </div>
-                            )}
-
-                            {fileData.type === 'text' && (
-                              <div>
-                                <p className="text-blue-700 mb-2">Text Content:</p>
-                                <pre className="bg-white p-2 rounded text-xs overflow-auto max-h-64 text-blue-900 whitespace-pre-wrap">
-                                  {fileData.content} {/* Now TypeScript knows this is always a string */}
-                                </pre>
-                              </div>
-                            )}
-
-                            {fileData.type === 'error' && (
-                              <div>
-                                <p className="text-red-700 mb-2">Error:</p>
-                                <pre className="bg-red-50 p-2 rounded text-xs text-red-900">
-                                  {fileData.content} {/* Now TypeScript knows this is always a string */}
-                                </pre>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {taskResult.resultType === 'json' && (
-                      <div>
-                        <strong>Processed Data (JSON):</strong>
-                        <pre className="bg-blue-50 p-3 rounded text-xs overflow-auto mt-2 text-blue-900 max-h-96">
-                          {taskResult.decodedResult
-                            ? JSON.stringify(taskResult.decodedResult, null, 2)
-                            : 'No data available'
-                          }
-                        </pre>
-                      </div>
-                    )}
-
-                    {taskResult.resultType === 'text' && (
-                      <div>
-                        <strong>Processed Data (Text):</strong>
-                        <pre className="bg-blue-50 p-3 rounded text-xs overflow-auto mt-2 text-blue-900 max-h-96 whitespace-pre-wrap">
-                          {typeof taskResult.decodedResult === 'string'
-                            ? taskResult.decodedResult
-                            : JSON.stringify(taskResult.decodedResult || 'No data available', null, 2)
-                          }
-                        </pre>
-                      </div>
-                    )}
-
-                    {taskResult.resultType === 'binary' && (
-                      <div>
-                        <strong>Binary Data:</strong>
-                        <p className="text-blue-700 mb-2">
-                          {typeof taskResult.decodedResult === 'string'
-                            ? taskResult.decodedResult
-                            : 'Binary data detected'
-                          }
-                        </p>
-                        <details className="bg-blue-50 p-3 rounded">
-                          <summary className="cursor-pointer text-blue-900 font-medium">View Hex Data (first 100 bytes)</summary>
-                          <pre className="text-xs mt-2 text-blue-800 overflow-auto">
-                            {taskResult.hexPreview || 'No hex preview available'}
-                          </pre>
-                        </details>
-                      </div>
-                    )}
-
-                    <div>
-                      <strong>Raw Result Info:</strong>
-                      <div className="bg-blue-50 p-3 rounded text-xs mt-2 text-blue-900">
-                        <p>Type: {taskResult.result instanceof ArrayBuffer ? 'ArrayBuffer' : typeof taskResult.result}</p>
-                        {taskResult.result instanceof ArrayBuffer && (
-                          <p>Size: {taskResult.result.byteLength} bytes</p>
-                        )}
-                        {taskResult.resultType === 'zip' && (
-                          <p>Format: ZIP Archive containing {extractedFiles ? Object.keys(extractedFiles).length : 0} files</p>
-                        )}
-                      </div>
-                    </div>
-
-                    <details className="bg-blue-50 rounded">
-                      <summary className="cursor-pointer p-3 text-blue-900 font-medium">View Complete Task Result</summary>
-                      <pre className="p-3 text-xs overflow-auto text-blue-800 max-h-64">
-                        {JSON.stringify({
-                          ...taskResult,
-                          result: taskResult.result instanceof ArrayBuffer
-                            ? `[ArrayBuffer ${taskResult.result.byteLength} bytes]`
-                            : taskResult.result
-                        }, null, 2)}
-                      </pre>
-                    </details>
-                  </div>
-                </div>
+              ) : (
+                <button onClick={logout} className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-6 py-2.5 rounded-lg transition-all duration-200 border border-gray-200">
+                  Disconnect
+                </button>
               )}
             </div>
           </div>
-        ) : (
-          <div className="text-center py-12 px-6">
-            <h2 className="mb-4 text-xl text-gray-600">
-              Connect your wallet to get started
-            </h2>
-            <p className="text-gray-500 mb-6">
-              You need to connect your wallet to use data protection features.
-            </p>
-            <button onClick={login} className="primary">
-              Connect my wallet
-            </button>
+        </nav>
+
+        <section className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+          <div className="p-6 sm:p-8 md:p-10">
+            {isConnected ? (
+              <div>
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                    Secure Invoice Protection
+                  </h2>
+                </div>
+
+                <form onSubmit={protectData} className="mb-8">
+                  <input type="hidden" name="name" value={dataToProtect.name} />
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div>
+                      <label htmlFor="invoice_id" className="block text-sm font-medium text-gray-700 mb-2">
+                        Invoice ID
+                      </label>
+                      <input
+                        onChange={(e) =>
+                          setDataToProtect((prev) => ({ ...prev, invoiceId: e.target.value }))
+                        }
+                        type="text"
+                        id="invoice_id"
+                        placeholder="INV-2024-001"
+                        value={dataToProtect.invoiceId}
+                        maxLength={200}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-2">
+                        Amount
+                      </label>
+                      <input
+                        onChange={(e) =>
+                          setDataToProtect((prev) => ({ ...prev, amount: e.target.value }))
+                        }
+                        type="text"
+                        id="amount"
+                        placeholder="100.50"
+                        value={dataToProtect.amount}
+                        maxLength={200}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="chain" className="block text-sm font-medium text-gray-700 mb-2">
+                        Blockchain
+                      </label>
+                      <input
+                        onChange={(e) =>
+                          setDataToProtect((prev) => ({ ...prev, chain: e.target.value }))
+                        }
+                        type="text"
+                        id="chain"
+                        placeholder="Ethereum"
+                        value={dataToProtect.chain}
+                        maxLength={200}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="token" className="block text-sm font-medium text-gray-700 mb-2">
+                        Token
+                      </label>
+                      <input
+                        onChange={(e) =>
+                          setDataToProtect((prev) => ({ ...prev, token: e.target.value }))
+                        }
+                        type="text"
+                        id="token"
+                        placeholder="USDC"
+                        value={dataToProtect.token}
+                        maxLength={200}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    disabled={
+                      !dataToProtect.invoiceId || !dataToProtect.amount || !dataToProtect.chain || !dataToProtect.token || isLoading
+                    }
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium px-6 py-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] disabled:scale-100 shadow-lg disabled:shadow-none"
+                    type="submit"
+                  >
+                    {isLoading ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Protecting Data...
+                      </span>
+                    ) : (
+                      "🔒 Protect My Invoice Data"
+                    )}
+                  </button>
+                </form>
+
+                {protectedData && (
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 mt-6">
+                    <h3 className="text-green-800 mb-4 text-lg font-semibold flex items-center gap-2">
+                      ✅ Data Protected Successfully!
+                    </h3>
+                    <div className="text-green-800 space-y-3 text-sm">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <strong className="text-green-900">Name:</strong>
+                          <p className="text-green-700">{protectedData.name}</p>
+                        </div>
+                        <div>
+                          <strong className="text-green-900">Address:</strong>
+                          <p className="break-all text-green-700 font-mono text-xs">{protectedData.address}</p>
+                          {getExplorerUrl(protectedData.address, "dataset") && (
+                            <a
+                              href={getExplorerUrl(protectedData.address, "dataset")!}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center text-green-600 hover:text-green-800 transition-colors mt-1 text-xs"
+                            >
+                              View on Explorer <ExternalLinkIcon />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {grantedAccess && (
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 mt-6">
+                    <h3 className="text-blue-800 mb-4 text-lg font-semibold flex items-center gap-2">
+                      🎯 Access Granted Automatically!
+                    </h3>
+                    <div className="text-blue-800 space-y-3 text-sm">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <strong className="text-blue-900">Volume:</strong>
+                          <p className="text-blue-700">{grantedAccess.volume}</p>
+                        </div>
+                        <div>
+                          <strong className="text-blue-900">Price:</strong>
+                          <p className="text-blue-700">{grantedAccess.datasetprice} nRLC</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Execute iApp Section */}
+                <div className="mt-4 pt-4">
+                  <div className="text-center mb-6">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">
+                      Execute iApp Processing
+                    </h2>
+                  </div>
+
+                  <div className="flex flex-col items-center">
+                    <button
+                      onClick={executeIApp}
+                      disabled={!dataProtectorCore || !protectedData?.address || isExecuting}
+                      className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium px-8 py-4 rounded-lg transition-all duration-200 transform hover:scale-105 disabled:scale-100 shadow-lg disabled:shadow-none mb-4"
+                    >
+                      {isExecuting ? (
+                        <span className="flex items-center gap-2">
+                          <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Executing iApp...
+                        </span>
+                      ) : (
+                        "⚡ Execute iApp"
+                      )}
+                    </button>
+                    
+                    {!protectedData?.address && (
+                      <p className="text-sm text-gray-500 text-center bg-gray-50 px-4 py-2 rounded-lg border">
+                        📋 Please protect your data first to enable iApp execution
+                      </p>
+                    )}
+                  </div>
+
+                  {executeResult && (
+                    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-6 mt-6">
+                      <h3 className="text-emerald-800 mb-4 text-lg font-semibold flex items-center gap-2">
+                        🎉 iApp Executed Successfully!
+                      </h3>
+                      <div className="text-emerald-800 space-y-3 text-sm">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div>
+                            <strong className="text-emerald-900">Transaction:</strong>
+                            <p className="break-all text-emerald-700 font-mono text-xs">{executeResult.txHash}</p>
+                          </div>
+                          <div>
+                            <strong className="text-emerald-900">Deal ID:</strong>
+                            <p className="break-all text-emerald-700 font-mono text-xs">{executeResult.dealId}</p>
+                          </div>
+                          <div>
+                            <strong className="text-emerald-900">Task ID:</strong>
+                            <p className="break-all text-emerald-700 font-mono text-xs">{executeResult.taskId}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-16 px-6">
+                <div className="max-w-md mx-auto">
+                  <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                  </div>
+                  <h2 className="mb-4 text-2xl font-bold text-gray-800">
+                    Welcome to RomePay
+                  </h2>
+                  <p className="text-gray-600 mb-8 leading-relaxed">
+                    Secure your invoice data with advanced cryptographic protection. Connect your wallet to get started with our decentralized data protection platform.
+                  </p>
+                  <button onClick={login} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium px-8 py-4 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg">
+                    Connect Wallet to Begin
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-        )}
-      </section>
+        </section>
+      </div>
     </div>
   );
 }
